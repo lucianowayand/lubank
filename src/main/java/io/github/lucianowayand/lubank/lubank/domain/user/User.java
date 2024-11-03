@@ -1,4 +1,4 @@
-package io.github.lucianowayand.lubank.lubank.model;
+package io.github.lucianowayand.lubank.lubank.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,6 +10,7 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
+    @GeneratedValue
     private UUID id;
 
     private String name;
@@ -17,10 +18,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @PrePersist
-    public void prePersist() {
-        if (id == null) {
-            id = UUID.randomUUID();
-        }
-    }
+    @Column(unique = true, nullable = false, name = "gov_reg_code")
+    private String govRegCode;
 }
