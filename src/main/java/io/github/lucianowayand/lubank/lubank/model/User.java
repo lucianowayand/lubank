@@ -1,9 +1,6 @@
 package io.github.lucianowayand.lubank.lubank.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.UUID;
@@ -19,4 +16,11 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 }
