@@ -5,6 +5,8 @@ RUN apt install openjdk-17-jdk -y
 
 COPY . .
 
+RUN chmod +x gradlew
+
 RUN ./gradlew build
 
 FROM openjdk:17-jdk-slim
