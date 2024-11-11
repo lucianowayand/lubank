@@ -6,6 +6,7 @@ import io.github.lucianowayand.lubank.lubank.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDTO data, BindingResult result) {
         if(result.hasErrors()){
             var errorsList = result.getAllErrors();
@@ -51,6 +52,11 @@ public class UserController {
         }
 
         return service.authenticateUser(data);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getUserInformation(Authentication auth){
+        return ResponseEntity.ok(service.findByGovRegCode(auth.getName()));
     }
 
 }

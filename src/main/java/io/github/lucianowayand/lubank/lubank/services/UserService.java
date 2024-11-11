@@ -31,8 +31,6 @@ import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
-    private final AuthenticationManager authenticationManager;
-
     @Autowired
     public UserService(UserRepository repository, @Lazy AuthenticationManager authenticationManager) {
         this.repository = repository;
@@ -48,12 +46,18 @@ public class UserService implements UserDetailsService {
     @Autowired
     private final UserRepository repository;
 
+    private final AuthenticationManager authenticationManager;
+
     public List<User> findAll() {
         return repository.findAll();
     }
 
     public User findById(UUID id) {
         return repository.findById(id);
+    }
+
+    public User findByGovRegCode(String govRegCode) {
+        return repository.findByGovRegCode(govRegCode);
     }
 
     @Override
