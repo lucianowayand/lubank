@@ -1,45 +1,156 @@
 package io.github.lucianowayand.lubank.lubank.services;
 
-import io.github.lucianowayand.lubank.lubank.domain.User;
-import io.github.lucianowayand.lubank.lubank.domain.user.UserDTO;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import io.github.lucianowayand.lubank.lubank.models.user.LoginDTO;
+import io.github.lucianowayand.lubank.lubank.models.user.User;
+import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDTO;
 import io.github.lucianowayand.lubank.lubank.repositories.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
+    private final AuthenticationManager authenticationManager;
+
     @Autowired
-    private UserRepository repository;
-
-    public User createUser(UserDTO dto){
-        User newUser = new User();
-        newUser.setEmail(dto.email());
-        newUser.setName(dto.name());
-        newUser.setGovRegCode(dto.govRegCode());
-
-        return repository.save(newUser);
+    public UserService(UserRepository repository, @Lazy AuthenticationManager authenticationManager) {
+        this.repository = repository;
+        this.authenticationManager = authenticationManager;
     }
+
+    @Value("${security.jwt.secret-key}")
+    private String jwtSecretKey;
+
+    @Value("${security.jwt.issuer}")
+    private String jwtIssuer;
+
+    @Autowired
+    private final UserRepository repository;
 
     public List<User> findAll() {
         return repository.findAll();
     }
 
-    public void deleteById(UUID id){
-        var user = repository.findById(id);
-
-        if (user != null) {
-            repository.delete(user);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-    }
-
     public User findById(UUID id) {
         return repository.findById(id);
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = repository.findByGovRegCode(username);
+
+        if(user != null) {
+            return org.springframework.security.core.userdetails.User.withUsername(user.getGovRegCode()).password(user.getPassword()).build();
+        }
+
+        return null;
+    }
+
+    private String createJwtToken(User user) {
+        Instant now = Instant.now();
+
+        JwtClaimsSet claim = JwtClaimsSet.builder()
+                .issuer(jwtIssuer)
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(24 * 3600))
+                .subject(user.getGovRegCode())
+                .build();
+
+        var encoder = new NimbusJwtEncoder(
+                new ImmutableSecret<>(jwtSecretKey.getBytes()));
+        var params = JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(), claim);
+
+        return encoder.encode(params).getTokenValue();
+    }
+
+    public ResponseEntity<Object> createUser(CreateUserDTO dto) {
+        try {
+            var user = repository.findByGovRegCode(dto.getGovRegCode());
+            if (user != null){
+                return ResponseEntity.badRequest().body("A user with this government registration code already exists.");
+            }
+
+            user = repository.findByEmail(dto.getEmail());
+            if (user != null){
+                return ResponseEntity.badRequest().body("A user with this email already exists.");
+            }
+
+            var bCryptEncoder = new BCryptPasswordEncoder();
+            User newUser = new User();
+            newUser.setName(dto.getName());
+            newUser.setEmail(dto.getEmail());
+            newUser.setGovRegCode(dto.getGovRegCode());
+            newUser.setPassword(bCryptEncoder.encode(dto.getPassword()));
+            newUser.setCreatedAt(new Date());
+
+            repository.save(newUser);
+
+            String jwtToken = createJwtToken(newUser);
+
+            var response = new HashMap<String, Object>();
+            response.put("token", jwtToken);
+            response.put("user", newUser);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception ex) {
+            System.out.println("Exception :");
+            ex.printStackTrace();
+        }
+
+        return ResponseEntity.badRequest().body("Internal Server Error.");
+    }
+
+    public ResponseEntity<Object> authenticateUser(LoginDTO data){
+        try {
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                data.getGovRegCode(),
+                                data.getPassword()
+                        )
+                );
+            } catch (Exception err) {
+                return ResponseEntity.status(401).body("Government Registration Code and password don't match.");
+            }
+
+            User user = repository.findByGovRegCode(data.getGovRegCode());
+            String jwtToken = createJwtToken(user);
+
+            var response = new HashMap<String, Object>();
+            response.put("token", jwtToken);
+            response.put("user", user);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception ex) {
+            System.out.println("Exception :");
+            ex.printStackTrace();
+        }
+
+        return ResponseEntity.badRequest().body("Internal Server Error.");
+    }
+
 }
