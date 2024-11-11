@@ -9,7 +9,7 @@ Lubank is a Spring Boot-based API for handling basic banking operations. The pro
 * Gradle
 * PostgreSQL
 
-### Installation
+### Installation (Local)
 1. Clone the repository:
 ```shell
 git clone https://github.com/lucianowayand/lubank.git
@@ -41,6 +41,20 @@ SECRET_KEY=your_secret_key
 ./gradlew bootRun
 ```
 The API will be available at http://localhost:8080.
+
+### Installation (Docker)
+To make it easier to run the API, you can use Docker.
+1. Build the Docker image:
+```shell
+docker build -t lubank:latest .
+```
+
+2. Run the Docker container:
+```shell
+docker run -p 8080:8080 lubank:latest
+```
+The .env file will be automatically copied during the Docker build step, so make sure it is present in the root directory.
+
 
 ## Dependencies
 The project uses several key dependencies:
