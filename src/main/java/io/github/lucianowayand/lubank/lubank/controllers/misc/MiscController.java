@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class MiscController {
 
-    @GetMapping("/cron")
-    private ResponseEntity.BodyBuilder cronRefresher() {
-        return ResponseEntity.ok();
+    @GetMapping("/service-status")
+    private ResponseEntity<Object> cronRefresher() {
+        return ResponseEntity.ok("OK");
     }
 }
