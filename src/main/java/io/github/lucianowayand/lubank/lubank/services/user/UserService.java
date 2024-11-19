@@ -1,11 +1,10 @@
-package io.github.lucianowayand.lubank.lubank.services;
+package io.github.lucianowayand.lubank.lubank.services.user;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import io.github.lucianowayand.lubank.lubank.models.user.LoginDTO;
 import io.github.lucianowayand.lubank.lubank.models.user.User;
 import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDTO;
-import io.github.lucianowayand.lubank.lubank.repositories.UserRepository;
-import jakarta.annotation.PostConstruct;
+import io.github.lucianowayand.lubank.lubank.repositories.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -24,10 +23,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -108,6 +105,9 @@ public class UserService implements UserDetailsService {
             newUser.setGovRegCode(dto.getGovRegCode());
             newUser.setPassword(bCryptEncoder.encode(dto.getPassword()));
             newUser.setCreatedAt(new Date());
+
+            int accountNumber =  ThreadLocalRandom.current().nextInt(1, 100000);
+            newUser.setAccount(accountNumber);
 
             repository.save(newUser);
 

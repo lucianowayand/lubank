@@ -1,4 +1,4 @@
-package io.github.lucianowayand.lubank.lubank.repositories;
+package io.github.lucianowayand.lubank.lubank.repositories.user;
 
 import io.github.lucianowayand.lubank.lubank.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

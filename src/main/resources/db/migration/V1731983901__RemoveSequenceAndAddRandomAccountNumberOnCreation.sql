@@ -1,0 +1,4 @@
+ALTER TABLE "users"
+ALTER COLUMN account DROP DEFAULT;
+
+DROP SEQUENCE IF EXISTS user_account_seq;

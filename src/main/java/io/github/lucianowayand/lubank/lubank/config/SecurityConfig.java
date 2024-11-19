@@ -1,6 +1,6 @@
 package io.github.lucianowayand.lubank.lubank.config;
 
-import io.github.lucianowayand.lubank.lubank.services.UserService;
+import io.github.lucianowayand.lubank.lubank.services.user.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

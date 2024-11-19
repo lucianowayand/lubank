@@ -1,8 +1,8 @@
-package io.github.lucianowayand.lubank.lubank.controllers;
+package io.github.lucianowayand.lubank.lubank.controllers.user;
 
 import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDTO;
 import io.github.lucianowayand.lubank.lubank.models.user.LoginDTO;
-import io.github.lucianowayand.lubank.lubank.services.UserService;
+import io.github.lucianowayand.lubank.lubank.services.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
