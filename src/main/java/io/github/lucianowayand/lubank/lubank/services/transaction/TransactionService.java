@@ -39,10 +39,10 @@ public class TransactionService {
         return balance;
     }
 
-    public void sendTransaction(UUID senderId, CreateTransactionDto dto) {
+    public void sendTransaction(UUID senderId, UUID receiverId, CreateTransactionDto dto) {
         Transaction transaction = new Transaction();
         transaction.setSenderId(senderId);
-        transaction.setReceiverId(dto.getReceiverId());
+        transaction.setReceiverId(receiverId);
         transaction.setAmount(dto.getAmount());
         transaction.setCreatedAt(new Date());
 

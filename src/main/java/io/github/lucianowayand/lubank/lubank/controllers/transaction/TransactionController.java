@@ -54,12 +54,12 @@ public class TransactionController {
 
         try {
             User user = userService.findByGovRegCode(auth.getName());
-            User receiver = userService.findById(dto.getReceiverId());
+            User receiver = userService.findByGovRegCode(dto.getReceiverGovRegCode());
 
             Float balance = service.getUserBalance(user.getId());
 
             if (receiver != null && balance >= dto.getAmount()){
-                service.sendTransaction(user.getId(), dto);
+                service.sendTransaction(user.getId(), receiver.getId(), dto);
                 return ResponseEntity.ok("OK");
             } else {
                 return ResponseEntity.badRequest().body("Remetente não existente ou saldo insuficiente.");
