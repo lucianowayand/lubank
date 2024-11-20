@@ -59,7 +59,7 @@ public class TransactionController {
             Float balance = service.getUserBalance(user.getId());
 
             if (receiver != null && balance >= dto.getAmount()){
-                service.sendTransaction(user.getId(), receiver.getId(), dto);
+                service.sendTransaction(user, receiver, dto);
                 return ResponseEntity.ok("OK");
             } else {
                 return ResponseEntity.badRequest().body("Remetente não existente ou saldo insuficiente.");

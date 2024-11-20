@@ -2,6 +2,8 @@ package io.github.lucianowayand.lubank.lubank.services.transaction;
 
 import io.github.lucianowayand.lubank.lubank.models.transaction.CreateTransactionDto;
 import io.github.lucianowayand.lubank.lubank.models.transaction.Transaction;
+import io.github.lucianowayand.lubank.lubank.models.transaction.TransactionDto;
+import io.github.lucianowayand.lubank.lubank.models.transaction.TransactionMapper;
 import io.github.lucianowayand.lubank.lubank.models.user.User;
 import io.github.lucianowayand.lubank.lubank.repositories.transaction.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +17,25 @@ import java.util.UUID;
 public class TransactionService {
     @Autowired
     private final TransactionRepository repository;
+    private final TransactionMapper transactionMapper;
 
-    public TransactionService(TransactionRepository repository) {
+    public TransactionService(TransactionRepository repository, TransactionMapper transactionMapper) {
         this.repository = repository;
+        this.transactionMapper = transactionMapper;
     }
 
-    public List<Transaction> findByUserId(UUID userId) {
-        return repository.findByUserId(userId);
+    public List<TransactionDto> findByUserId(UUID userId) {
+        List<Transaction> transactions = repository.findByUserId(userId);
+        return transactions.stream()
+                .map(transaction -> transactionMapper.toDto(transaction, userId))
+                .toList();
     }
 
     public Float getUserBalance(UUID userId) {
-        List<Transaction> transactions = this.findByUserId(userId);
+        List<TransactionDto> transactions = this.findByUserId(userId);
         float balance = 0.0f;
 
-        for (Transaction transaction : transactions) {
+        for (TransactionDto transaction : transactions) {
             if (transaction.getSenderId().equals(userId)) {
                 balance -= transaction.getAmount();
             } else if (transaction.getReceiverId().equals(userId)) {
@@ -39,10 +46,10 @@ public class TransactionService {
         return balance;
     }
 
-    public void sendTransaction(UUID senderId, UUID receiverId, CreateTransactionDto dto) {
+    public void sendTransaction(User sender, User receiver, CreateTransactionDto dto) {
         Transaction transaction = new Transaction();
-        transaction.setSenderId(senderId);
-        transaction.setReceiverId(receiverId);
+        transaction.setSender(sender);
+        transaction.setReceiver(receiver);
         transaction.setAmount(dto.getAmount());
         transaction.setCreatedAt(new Date());
 

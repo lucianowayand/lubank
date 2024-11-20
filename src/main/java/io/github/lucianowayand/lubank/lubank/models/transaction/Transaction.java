@@ -1,5 +1,6 @@
 package io.github.lucianowayand.lubank.lubank.models.transaction;
 
+import io.github.lucianowayand.lubank.lubank.models.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,11 +18,13 @@ public class Transaction {
     @Column(nullable = false, name="created_at")
     private Date createdAt;
 
-    @Column(nullable = false)
-    private UUID senderId;
+    @ManyToOne
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
-    @Column(nullable = false)
-    private UUID receiverId;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id", nullable = false)
+    private User receiver;
 
     @Column(nullable = false)
     private float amount;
