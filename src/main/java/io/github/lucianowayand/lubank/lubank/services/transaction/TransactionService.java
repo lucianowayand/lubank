@@ -1,11 +1,13 @@
 package io.github.lucianowayand.lubank.lubank.services.transaction;
 
+import io.github.lucianowayand.lubank.lubank.models.transaction.CreateTransactionDto;
 import io.github.lucianowayand.lubank.lubank.models.transaction.Transaction;
 import io.github.lucianowayand.lubank.lubank.models.user.User;
 import io.github.lucianowayand.lubank.lubank.repositories.transaction.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,5 +37,15 @@ public class TransactionService {
         }
 
         return balance;
+    }
+
+    public void sendTransaction(UUID senderId, CreateTransactionDto dto) {
+        Transaction transaction = new Transaction();
+        transaction.setSenderId(senderId);
+        transaction.setReceiverId(dto.getReceiverId());
+        transaction.setAmount(dto.getAmount());
+        transaction.setCreatedAt(new Date());
+
+        repository.save(transaction);
     }
 }

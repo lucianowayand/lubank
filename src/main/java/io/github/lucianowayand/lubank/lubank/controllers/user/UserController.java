@@ -1,7 +1,7 @@
 package io.github.lucianowayand.lubank.lubank.controllers.user;
 
-import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDTO;
-import io.github.lucianowayand.lubank.lubank.models.user.LoginDTO;
+import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDto;
+import io.github.lucianowayand.lubank.lubank.models.user.LoginDto;
 import io.github.lucianowayand.lubank.lubank.services.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class UserController {
     private UserService service;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDTO data, BindingResult result) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDto data, BindingResult result) {
         if(result.hasErrors()){
             var errorsList = result.getAllErrors();
             var errorsMap = new HashMap<String, String>();
@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO data, BindingResult result){
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginDto data, BindingResult result){
         if(result.hasErrors()){
             var errorsList = result.getAllErrors();
             var errorsMap = new HashMap<String, String>();

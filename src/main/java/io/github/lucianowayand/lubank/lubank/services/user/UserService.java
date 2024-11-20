@@ -1,9 +1,9 @@
 package io.github.lucianowayand.lubank.lubank.services.user;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import io.github.lucianowayand.lubank.lubank.models.user.LoginDTO;
+import io.github.lucianowayand.lubank.lubank.models.user.LoginDto;
 import io.github.lucianowayand.lubank.lubank.models.user.User;
-import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDTO;
+import io.github.lucianowayand.lubank.lubank.models.user.CreateUserDto;
 import io.github.lucianowayand.lubank.lubank.repositories.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +86,7 @@ public class UserService implements UserDetailsService {
         return encoder.encode(params).getTokenValue();
     }
 
-    public ResponseEntity<Object> createUser(CreateUserDTO dto) {
+    public ResponseEntity<Object> createUser(CreateUserDto dto) {
         try {
             var user = repository.findByGovRegCode(dto.getGovRegCode());
             if (user != null){
@@ -127,7 +127,7 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.badRequest().body("Internal Server Error.");
     }
 
-    public ResponseEntity<Object> authenticateUser(LoginDTO data){
+    public ResponseEntity<Object> authenticateUser(LoginDto data){
         try {
             try {
                 authenticationManager.authenticate(

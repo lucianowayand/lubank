@@ -1,16 +1,17 @@
 package io.github.lucianowayand.lubank.lubank.models.user;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CreateUserDTO {
+public class CreateUserDto {
 
     @NotEmpty
     private String name;
 
-    @NotEmpty
+    @NotEmpty @Email
     private String email;
 
     @NotEmpty

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class LoginDTO {
+public class LoginDto {
     @NotEmpty
     private String govRegCode;
 
